@@ -13,13 +13,13 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Startup Name Generator',
+      theme: ThemeData(
+        primarySwatch: Colors.red,
+      ),
       home: RandomWords(),
-      );
+    );
   }
 }
-
-
-
 
 class RandomWords extends StatefulWidget {
   const RandomWords({Key? key}) : super(key: key);
@@ -32,47 +32,39 @@ class RandomWords extends StatefulWidget {
 }
 
 class _RandomWordsState extends State<RandomWords> {
-
   final _suggestions = <WordPair>[];
   final _saved = <WordPair>{};
   final _biggerFont = const TextStyle(fontSize: 18.0);
 
   void _pushSaved() {
-    Navigator.of(context).push(
-      MaterialPageRoute<void>(
-          builder: (BuildContext context) {
-            final tiles = _saved.map(
-              (WordPair pair) {
-                return ListTile(
-                  title: Text(
-                  pair.asPascalCase,
-                  style: _biggerFont,
-                  ),
-                );
-              },
-            );
+    Navigator.of(context)
+        .push(MaterialPageRoute<void>(builder: (BuildContext context) {
+      final tiles = _saved.map(
+        (WordPair pair) {
+          return ListTile(
+            title: Text(
+              pair.asPascalCase,
+              style: _biggerFont,
+            ),
+          );
+        },
+      );
 
-            final divide = ListTile.divideTiles(
-                context: context,
-                tiles: tiles
-            ).toList();
+      final divide =
+          ListTile.divideTiles(context: context, tiles: tiles).toList();
 
-            return Scaffold(
-              appBar: AppBar(
-                title: Text('Saved Suggestion'),
-              ),
-              body: ListView(children: divide),
-            );
-        }
-      )
-    );
+      return Scaffold(
+        appBar: AppBar(
+          title: Text('Saved Suggestion'),
+        ),
+        body: ListView(children: divide),
+      );
+    }));
   }
 
-
   Widget _buildRow(WordPair pair) {
-    
     final alreadySaved = _saved.contains(pair);
-    
+
     return ListTile(
       title: Text(
         pair.asPascalCase,
@@ -86,7 +78,7 @@ class _RandomWordsState extends State<RandomWords> {
         setState(() {
           if (alreadySaved) {
             _saved.remove(pair);
-          }else {
+          } else {
             _saved.add(pair);
           }
         });
@@ -96,16 +88,16 @@ class _RandomWordsState extends State<RandomWords> {
 
   Widget _buildSuggestions() {
     return ListView.builder(
-      padding: const EdgeInsets.all(16.0),
-      itemBuilder: (context, i) {
-        if (i.isOdd) return const Divider();
+        padding: const EdgeInsets.all(16.0),
+        itemBuilder: (context, i) {
+          if (i.isOdd) return const Divider();
 
-        final index = i ~/ 2;
-        if (index >= _suggestions.length){
-          _suggestions.addAll(generateWordPairs().take(10));
-        }
-        return _buildRow(_suggestions[index]);
-    });
+          final index = i ~/ 2;
+          if (index >= _suggestions.length) {
+            _suggestions.addAll(generateWordPairs().take(10));
+          }
+          return _buildRow(_suggestions[index]);
+        });
   }
 
   @override
@@ -116,7 +108,19 @@ class _RandomWordsState extends State<RandomWords> {
         actions: [IconButton(onPressed: _pushSaved, icon: Icon(Icons.list))],
       ),
       body: _buildSuggestions(),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => ScaffoldMessenger.of(context).showMaterialBanner(
+            MaterialBanner(
+                content: const Text('Teste material banner'),
+                actions: [
+                  TextButton(
+                      onPressed: () => ScaffoldMessenger.of(context).hideCurrentMaterialBanner(),
+                      child: const Text('Fechar')
+                  )
+                ]
+            )),
+        child: const Icon(Icons.info),
+      ),
     );
   }
 }
-
